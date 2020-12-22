@@ -15,21 +15,22 @@ This is a sandbox project to set up an environment with Airflow and Docker in or
 
 ## Structure
 
-### Containers**
+### Containers
 
 `docker-compose` is used to launch:
-* `postgres` or `voucher-segmenter-airflow_postgres_1`:  Postgres Database instance
-* `airflow` or `voucher-segmenter-airflow_webserver_1`: `LocalExecutor` Airflow setup
-* `api` or `voucher-segmenter-airflow_api_1`: Local API using Flask
+* `postgres` or voucher-segmenter-airflow_postgres_1:  Postgres Database instance
+* `airflow` or voucher-segmenter-airflow_webserver_1: `LocalExecutor` Airflow setup
+* `api` or voucher-segmenter-airflow_api_1: Local API using Flask
 
-### Database**
+### Database
 * Version: postgres:9.6
 * Schema: `voucher_customer`
 * Config: `docker-compose.yml`
 
-### Data pipeline**:
+### Data pipeline:
 
 Version: Airflow v1.10.9, with Python 3.7 (using [puckel/docker-airflow](https://github.com/puckel/docker-airflow))
+Config: `dags` dir, root dir files
 
 #### Process
 
@@ -74,7 +75,7 @@ airflow=# select * from voucher_customer.voucher_segments;
 ### API
 
 The Flask API (http://localhost:5000) which queries from `voucher_customer.voucher_segments`
-
+Config: `api` dir, `docker-compose.yml`
 
 ## Setup
 
