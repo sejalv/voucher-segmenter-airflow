@@ -1,0 +1,7 @@
+# TODO: lib versions
+psycopg2-binary
+awscli
+boto3
+pyarrow
+pandas
+pytest-cov
