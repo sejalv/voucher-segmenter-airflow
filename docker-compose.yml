@@ -18,14 +18,10 @@ services:
             - ./external_data:/var/lib/postgresql/data/external
         ports:
             - 5432:5432
-#        expose:
-#            - "5432"
         logging:
             options:
                 max-size: 10m
                 max-file: "3"
-#        networks:
-#            - nw_default
 
     webserver:
         build: .
@@ -60,7 +56,6 @@ services:
             retries: 3
 
     api:
-        # restart: always
         build: api
         environment:
           - POSTGRES_HOST_AUTH_METHOD=trust
@@ -73,11 +68,4 @@ services:
             - 5000:5000
         depends_on:
             - postgres
-        # command: python -m pip install --user flask && python app.py
-#        networks:
-#            - nw_default
 
-#networks:
-#    nw_default:
-#        driver: bridge
-        # external: true
