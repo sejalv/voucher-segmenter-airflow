@@ -69,7 +69,7 @@ The Flask API (`localhost:5000`) queries from `voucher_customer.voucher_segments
 ## Prerequisites
 To run this locally, you would need a few things:
 * Docker installed
-* S3 bucket and access details
+* S3 bucket and access details (`Dockerfile`, `.env`)
 
 ## Setup
 
