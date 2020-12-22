@@ -13,21 +13,32 @@ segment.
 
 This is a sandbox project to set up an environment with Airflow and Docker in order to schedule and monitor pipelines.
 
-## Process
+## Structure
 
-**Containers**
+### Containers**
 
-`docker-compose` is used to launch Postgres instance and `LocalExecutor` Airflow setup
+`docker-compose` is used to launch:
+* `postgres` or `voucher-segmenter-airflow_postgres_1`:  Postgres Database instance
+* `airflow` or `voucher-segmenter-airflow_webserver_1`: `LocalExecutor` Airflow setup
+* `api` or `voucher-segmenter-airflow_api_1`: Local API using Flask
 
-**Data pipeline**:
+### Database**
+* Version: postgres:9.6
+* Schema: `voucher_customer`
+* Config: `docker-compose.yml`
 
-(Using Airflow)
+### Data pipeline**:
+
+Version: Airflow v1.10.9, with Python 3.7 (using [puckel/docker-airflow](https://github.com/puckel/docker-airflow))
+
+#### Process
 
 1. Generates `voucher_customer.customer_segments` table by loading data from `customer_segments.sql`
 2. Fetches voucher data from the S3 parquet
 3. Cleanses, filters, and maps the voucher data to customer segments.
 4. Updates the `voucher_customer.voucher_segments` table daily, with the count of vouchers used for a particular segment_type
 
+#### Final Output
 ```
 $ docker-compose exec postgres psql -U airflow
 psql (9.6.20)
@@ -60,45 +71,46 @@ airflow=# select * from voucher_customer.voucher_segments;
 
 ```
 
-**API**
+### API
 
-The Flask API (`localhost:5000`) queries from `voucher_customer.voucher_segments`
+The Flask API (http://localhost:5000) which queries from `voucher_customer.voucher_segments`
 
 
+## Setup
 
-## Prerequisites
+### Prerequisites
 To run this locally, you would need a few things:
 * Docker installed
 * S3 bucket and access details (`Dockerfile`, `.env`)
 
-## Setup
-
-#### Clone respository
+### Clone respository
 ```
 $ git clone https://github.com/sejalv/voucher-segmenter-airflow.git
 ```
 
-#### Move into new directory
+### Move into new directory
 ```
 $ cd voucher-segmenter-airflow
 ```
 
-#### Generate a fernet key for your environment and pipe into env file
+### Generate a fernet key for your environment and pipe into env file
 ```
 $ echo $(echo "FERNET_KEY='")$(openssl rand -base64 32)$(echo "'") >> airflow.env
 ```
 
-#### Launch docker containers in detached session
+## Execution
+
+### Launch docker containers in detached session
 ```
 $ docker-compose up --build
 ```
 
-#### In a new tab, initialise database for webserver
+### In a new tab, initialise database for webserver
 ```
 $ docker-compose exec webserver airflow initdb
 ```
 
-## Trigger pipeline
+### Trigger pipeline
 #### Trigger from command line
 ```
 $ docker-compose exec webserver airflow trigger_dag voucher_segmenter
@@ -106,12 +118,13 @@ $ docker-compose exec webserver airflow trigger_dag voucher_segmenter
 #### Or trigger from web UI
 * Open browser to `http://127.0.0.1:8080/`
 
-## API
+### Call API
 ```
 $ curl -X GET -H "Content-type: application/json" -d '{"customer_id": 123, "country_code": "Peru", "last_order_ts": "2018-05-03 00:00:00", "first_order_ts": "2017-05-03 00:00:00", "total_orders": 15, "segment_name": "recency_segment"}' "http://localhost:5000/voucher_amount"
 
 {"voucher_amount":[2640.0]}
 ```
+
 ## Test
 
 (TBD: Config error)
@@ -120,12 +133,12 @@ $ docker-compose exec webserver python -m unittest -v
 ```
 
 ## End
-#### Close docker session
+### Close docker session
 ```
 $ docker-compose down
 ```
 
-## Caveats
+### Caveats
 
 * you may need to check your `FERNET_KEY`
 * you may need to manually update `postgres_default` on the Airflow console
@@ -133,7 +146,6 @@ $ docker-compose down
 
 ## Future Enhancements
 * Airflow tasks run on same machine as scheduler
-* Parallelisation of tasks (workers) possible
-* Breaking down of utility functions into tasks, in `prepare_data.py`
+* Parallelisation of tasks (workers) possible, use of CeleryExecutor
+* Breaking down of utility functions into tasks for the pipeline, in `prepare_data.py`
 * ORM and security in Flask API
-
