@@ -5,6 +5,6 @@ COPY requirements.txt /usr/local/airflow/
 RUN python -m pip install --user -r requirements.txt
 
 ENV AIRFLOW_HOME=/usr/local/airflow
-ENV S3_PATH='s3://dh-data-chef-hiring-test/data-eng/voucher-selector/data.parquet.gzip'
+ENV S3_PATH=''
 
 COPY ./airflow.cfg /usr/local/airflow/airflow.cfg
