@@ -5,6 +5,6 @@ COPY requirements.txt /usr/local/airflow/
 RUN python -m pip install --user -r requirements.txt
 
 ENV AIRFLOW_HOME=/usr/local/airflow
-ENV S3_PATH=''
+ENV S3_PATH='' #S3 path for Input file
 
 COPY ./airflow.cfg /usr/local/airflow/airflow.cfg
